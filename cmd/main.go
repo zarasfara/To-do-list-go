@@ -1,63 +1,73 @@
 package main
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"log"
 )
 
 func main() {
-	myApp := app.New()
-	window := myApp.NewWindow("Todo List")
+	todoApp := app.New()
+	window := todoApp.NewWindow("Todo List")
 
-	// Создание виджетов для todo list
-	taskEntry := widget.NewEntry()
+	icon, err := fyne.LoadResourceFromPath("assets/icon.png")
+	if err != nil {
+		log.Printf("ошибка при загрузке иконки: %s", err.Error())
+	}
 
-	taskList := container.NewHBox()
+	window.SetIcon(icon)
 
-	addButton := widget.NewButton("Добавить", func() {
-		task := taskEntry.Text
-		if task != "" {
-			taskItem := widget.NewLabel(task)
-			taskList.Add(taskItem)
-			taskEntry.SetText("")
+	nameEntry := &widget.Entry{
+		PlaceHolder: "Введите название",
+	}
+
+	descriptionEntry := &widget.Entry{
+		PlaceHolder: "Введите описание",
+	}
+
+	// Сайд бар левая часть
+	list := container.NewVBox(
+		&widget.Label{
+			Text:      "Типы",
+			Alignment: 1,
+		},
+		widget.NewButton("Элемент 1", func() {
+			fmt.Print("1")
+		}),
+		widget.NewButton("Элемент 2", func() {
+			fmt.Print("2")
+		}),
+		widget.NewButton("Элемент 2", func() {
+			fmt.Print("2")
+		}))
+
+	// Кнопка "смена темы"
+	toggleThemeButton := widget.NewButton("Сменить тему", func() {
+		if todoApp.Settings().ThemeVariant() == theme.VariantDark {
+			todoApp.Settings().SetTheme(theme.LightTheme())
+		} else {
+			todoApp.Settings().SetTheme(theme.DarkTheme())
 		}
 	})
 
-	// Создание сайдбара
 	sidebar := container.NewVBox(
-		widget.NewLabel("Категории"),
-		widget.NewButton("All", func() {
-
-		}),
-		widget.NewButton("Work", func() {
-
-		}),
-		widget.NewButton("Personal", func() {
-
-		}),
-		widget.NewButton("Shopping", func() {
-
-		}),
+		list,
 		layout.NewSpacer(),
+		toggleThemeButton,
 	)
 
-	// Создание главного контейнера
-	content := container.NewBorder(
-		nil, // top
-		nil,
-		sidebar, // bottom
-		nil,     // left
-		container.NewVBox(
-			taskEntry,
-			addButton,
-			taskList,
-		), // right
-	)
+	// Правая часть
+	rightPart := container.NewVBox(nameEntry, descriptionEntry)
+
+	content := container.NewBorder(nil, nil, sidebar, nil, rightPart)
 
 	window.Resize(fyne.NewSize(800, 600))
 	window.SetContent(content)
+	window.CenterOnScreen()
 	window.ShowAndRun()
 }

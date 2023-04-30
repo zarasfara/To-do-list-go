@@ -1,11 +1,13 @@
 package app
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/zarasfara/to-do-list/internal/file"
 	"github.com/zarasfara/to-do-list/internal/ui/components"
 	"log"
 )
@@ -39,10 +41,21 @@ func (a *TaskApp) Run() {
 	table := components.NewTasksTable()
 
 	// Кнопка вызова модалки создания таски
-	toggleFormBtn := container.NewPadded(widget.NewButton("Создать задачу", func() {
-		// Создаем диалог с формой
-		components.NewCreateModelForm(win, table)
-	}))
+
+	buttonContainer := container.NewPadded(
+		container.NewVBox(container.NewHBox(
+			widget.NewButton("Создать задачу", func() {
+				// Создаем диалог с формой
+				components.NewCreateModelForm(win, table)
+			}), widget.NewButton("Удалить задачу", func() {
+				err := file.DeleteTask(components.TaskId)
+				if err != nil {
+					fmt.Errorf("ошибка")
+				}
+				table.RefreshTable()
+			})),
+		),
+	)
 
 	// Задаем контент для задач
 	taskContent := container.NewBorder(
@@ -50,7 +63,7 @@ func (a *TaskApp) Run() {
 		nil,
 		sidebar, // left
 		nil,
-		container.NewGridWithRows(2, container.NewHBox(container.NewVBox(toggleFormBtn)), table), // objects
+		container.NewGridWithRows(2, buttonContainer, table), // objects
 	)
 
 	// Задаем контент для напоминаний

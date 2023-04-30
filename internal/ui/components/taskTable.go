@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-// var TaskId int
+var TaskId int
 
 var tasks []models.Task
 
@@ -17,7 +17,7 @@ type TaskTable struct {
 }
 
 func (t *TaskTable) RefreshTable() {
-	tempTasks, err := file.ReadTasksFromFile("tasks.json")
+	tempTasks, err := file.ReadTasksFromFile()
 	if err != nil {
 		return
 	}
@@ -28,14 +28,13 @@ func (t *TaskTable) RefreshTable() {
 }
 
 func NewTasksTable() *TaskTable {
-
 	table := &TaskTable{}
 	table.ExtendBaseWidget(table)
 
 	// Создаем заголовки таблицы
 	headers := [...]string{"id", "Название", "Описание", "Категория", "Статус"}
 
-	tasks, _ = file.ReadTasksFromFile("tasks.json")
+	tasks, _ = file.ReadTasksFromFile()
 
 	table.Length = func() (int, int) {
 		return len(tasks) + 1, 5 // 5 строки, 5 столбца
@@ -78,7 +77,7 @@ func NewTasksTable() *TaskTable {
 			return
 		}
 
-		// TaskId = tasks[id.Row-1].Id
+		TaskId = tasks[id.Row-1].Id
 	}
 
 	columnWidth := 1000 / len(headers) // вычисляем ширину колонки

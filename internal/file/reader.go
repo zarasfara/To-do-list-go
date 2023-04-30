@@ -17,8 +17,8 @@ Returns:
 
 	[]models.Task: Срез структур задач
 */
-func ReadTasksFromFile(filePath string) ([]models.Task, error) {
-	file, err := os.Open(filePath)
+func ReadTasksFromFile() ([]models.Task, error) {
+	file, err := os.Open("tasks.json")
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func ReadTasksFromFile(filePath string) ([]models.Task, error) {
 	return tasks, nil
 }
 
-func WriteTasksToFile(title, description, category string) error {
+func WriteTaskToFile(title, description, category string) error {
 
 	// Получаем следующее значение id
 	nextId, err := getNextId()
@@ -82,6 +82,38 @@ func WriteTasksToFile(title, description, category string) error {
 		return err
 	}
 	err = json.NewEncoder(file).Encode(&tasks)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteTask(id int) error {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return err
+	}
+
+	// Находим индекс задачи по её ID
+	index := -1
+	for i, task := range tasks {
+		if task.Id == id {
+			index = i
+			break
+		}
+	}
+
+	if index < 0 {
+		return fmt.Errorf("задача с id %d не найдена", id)
+	}
+
+	// Удаляем задачу из списка задач
+	tasks = append(tasks[:index], tasks[index+1:]...)
+
+	data, _ := json.Marshal(tasks)
+
+	err = os.WriteFile("tasks.json", data, 0644)
 	if err != nil {
 		return err
 	}

@@ -44,7 +44,7 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 			// Если нажата кнопка "Submit", выводим данные из формы в консоль
 			// fmt.Printf("title: %s\ndescription: %s\ncategory: %s\n", titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
 
-			err := file.WriteTasksToFile(titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
+			err := file.WriteTaskToFile(titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
 			if err != nil {
 				fmt.Errorf("что-то пошло не так")
 			}

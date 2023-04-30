@@ -1,4 +1,4 @@
-package ui
+package components
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
+
+var themeVar bool = true
 
 func NewSideBar(app fyne.App) *fyne.Container {
 
@@ -29,10 +31,14 @@ func NewSideBar(app fyne.App) *fyne.Container {
 
 	// Кнопка "смена темы"
 	toggleThemeButton := widget.NewButton("Сменить тему", func() {
-		if app.Settings().ThemeVariant() == theme.VariantDark {
+		if themeVar {
+			// Текущая тема - темная
 			app.Settings().SetTheme(theme.LightTheme())
+			themeVar = false
 		} else {
+			// Текущая тема - светлая
 			app.Settings().SetTheme(theme.DarkTheme())
+			themeVar = true
 		}
 	})
 

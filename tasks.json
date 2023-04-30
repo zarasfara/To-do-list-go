@@ -1,6 +1,18 @@
 [
   {
-    "name": "Покакать",
-    "description" : "lorem ipsum"
+    "id": 1,
+    "title": "Сходить в магазин",
+    "description" : "lorem ipsum",
+    "category": "jopa",
+    "completed": false,
+    "createdAt": "02.01.2006"
+  },
+  {
+    "id": 2,
+    "title": "Сходить домой",
+    "description" : "lorem ipsum",
+    "category": "privet",
+    "completed": true,
+    "createdAt": "02.01.2006"
   }
 ]

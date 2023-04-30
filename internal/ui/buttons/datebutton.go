@@ -14,7 +14,6 @@ func NewDateButton() *widget.Entry {
 
 		if text == "" {
 			return fmt.Errorf("необходимо ввести значение")
-
 		}
 
 		_, err := time.Parse("02.01.2006", text)

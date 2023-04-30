@@ -5,16 +5,15 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"github.com/zarasfara/to-do-list/internal/ui/buttons"
+	"github.com/zarasfara/to-do-list/internal/file"
 )
 
-func NewCreateForm(window fyne.Window) {
+func NewCreateModelForm(window fyne.Window) {
 
 	// Создаем форму с необходимыми элементами
 	titleEntry := widget.NewEntry()
 	descriptionEntry := widget.NewEntry()
 	categoryEntry := widget.NewEntry()
-	dateEntry := buttons.NewDateButton()
 
 	items := []*widget.FormItem{
 		{
@@ -29,17 +28,18 @@ func NewCreateForm(window fyne.Window) {
 			Text:   "Категория",
 			Widget: categoryEntry,
 		},
-		{
-			Text:   "Дата",
-			Widget: dateEntry,
-		},
 	}
 
 	// Создаем диалог с формой
 	formDialog := dialog.NewForm("Введите данные", "Подтвердить", "Закрыть", items, func(ok bool) {
 		if ok {
 			// Если нажата кнопка "Submit", выводим данные из формы в консоль
-			fmt.Printf("title: %s\ndescription: %s\ncategory: %s\n date: %s\n", titleEntry.Text, descriptionEntry.Text, categoryEntry.Text, dateEntry.Text)
+			// fmt.Printf("title: %s\ndescription: %s\ncategory: %s\n", titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
+
+			err := file.WriteTasksToFile(titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
+			if err != nil {
+				fmt.Errorf("что-то пошло не так")
+			}
 		}
 	}, window)
 
@@ -47,5 +47,4 @@ func NewCreateForm(window fyne.Window) {
 
 	// Отображаем диалог с формой
 	formDialog.Show()
-
 }

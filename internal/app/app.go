@@ -37,7 +37,7 @@ func (a *TaskApp) Run() {
 	toggleFormBtn := widget.NewButton("Создать задачу", func() {
 
 		// Создаем диалог с формой
-		components.NewCreateForm(win)
+		components.NewCreateModelForm(win)
 	})
 
 	sidebar := components.NewSideBar(a) // Sidebar

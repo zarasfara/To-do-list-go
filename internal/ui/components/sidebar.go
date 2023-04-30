@@ -9,7 +9,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var themeVar bool = true
+var themeVar = true
 
 func NewSideBar(app fyne.App) *fyne.Container {
 
@@ -47,5 +47,4 @@ func NewSideBar(app fyne.App) *fyne.Container {
 		layout.NewSpacer(),
 		toggleThemeButton,
 	)
-
 }

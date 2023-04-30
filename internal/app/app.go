@@ -32,40 +32,19 @@ func (a *TaskApp) Run() {
 	}
 	win.SetIcon(icon)
 
-	toggleFormBtn := container.NewPadded(widget.NewButton("Создать задачу", func() {
-		// Создаем диалог с формой
-		components.NewCreateModelForm(win)
-	}))
-
+	// Сайд бар
 	sidebar := components.NewSideBar(a) // Sidebar
 
-	// Создаем заголовки таблицы
-	headers := []string{"Название", "Описание", "Дата"}
+	// Таблица с задачами
+	table := components.NewTasksTable()
 
-	table := widget.NewTable(
-		func() (int, int) {
-			return 3, 3 // 2 столбца, 3 строки
-		},
-		func() fyne.CanvasObject {
-			return widget.NewLabel("Cell")
-		},
-		func(cell widget.TableCellID, cellView fyne.CanvasObject) {
-			if cell.Row == 0 {
-				// Устанавливаем заголовки
-				cellView.(*widget.Label).SetText(headers[cell.Col])
-			} else {
-				// Устанавливаем значения ячеек таблицы
-				cellView.(*widget.Label).SetText("тварь, мразь")
-			}
-		},
-	)
+	// Кнопка вызова модалки создания таски
+	toggleFormBtn := container.NewPadded(widget.NewButton("Создать задачу", func() {
+		// Создаем диалог с формой
+		table.Refresh()
+	}))
 
-	numColumns := 3                  // задаем количество колонок
-	columnWidth := 1000 / numColumns // вычисляем ширину колонки
-	for i := 0; i < numColumns; i++ {
-		table.SetColumnWidth(i, float32(columnWidth))
-	}
-
+	// Задаем контент для задач
 	taskContent := container.NewBorder(
 		nil,
 		nil,
@@ -73,12 +52,19 @@ func (a *TaskApp) Run() {
 		nil,
 		container.NewGridWithRows(2, container.NewHBox(container.NewVBox(toggleFormBtn)), table), // objects
 	)
-	t := container.NewAppTabs(container.NewTabItem("Задачи", taskContent), container.NewTabItem("Напоминания", widget.NewLabel("Напоминания")))
+
+	// Задаем контент для напоминаний
+	// ...
+
+	content := container.NewAppTabs(
+		container.NewTabItem("Задачи", taskContent),
+		container.NewTabItem("Напоминания", widget.NewLabel("Напоминания")),
+	)
 
 	//---------------------------------------//
 	win.Resize(fyne.NewSize(1200, 800))
 	win.SetFixedSize(true)
-	win.SetContent(t)
+	win.SetContent(content)
 	win.CenterOnScreen()
 	win.ShowAndRun()
 }

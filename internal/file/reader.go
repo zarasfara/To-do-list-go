@@ -63,7 +63,6 @@ func WriteTasksToFile(title, description, category string) error {
 	}
 	defer file.Close()
 
-	// Читаем содержимое файла
 	var tasks []*models.Task
 	err = json.NewDecoder(file).Decode(&tasks)
 	if err != nil && err != io.EOF {

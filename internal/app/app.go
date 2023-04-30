@@ -41,7 +41,7 @@ func (a *TaskApp) Run() {
 	// Кнопка вызова модалки создания таски
 	toggleFormBtn := container.NewPadded(widget.NewButton("Создать задачу", func() {
 		// Создаем диалог с формой
-		table.Refresh()
+		components.NewCreateModelForm(win, table)
 	}))
 
 	// Задаем контент для задач
@@ -63,7 +63,6 @@ func (a *TaskApp) Run() {
 
 	//---------------------------------------//
 	win.Resize(fyne.NewSize(1200, 800))
-	win.SetFixedSize(true)
 	win.SetContent(content)
 	win.CenterOnScreen()
 	win.ShowAndRun()

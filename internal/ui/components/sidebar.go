@@ -16,10 +16,10 @@ func NewSideBar(app fyne.App) *fyne.Container {
 	// Сайд бар левая часть
 	list := container.NewVBox(
 		&widget.Label{
-			Text:      "Типы",
+			Text:      "Фильтры",
 			Alignment: 1,
 		},
-		widget.NewButton("Элемент 1", func() {
+		widget.NewButton("Не выполненные", func() {
 			fmt.Print("1")
 		}),
 		widget.NewButton("Элемент 2", func() {

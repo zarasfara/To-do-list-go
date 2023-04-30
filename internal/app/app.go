@@ -32,13 +32,10 @@ func (a *TaskApp) Run() {
 	}
 	win.SetIcon(icon)
 
-	//rightPart := ui.NewTaskForm() Мейби ещё понадобится
-
-	toggleFormBtn := widget.NewButton("Создать задачу", func() {
-
+	toggleFormBtn := container.NewPadded(widget.NewButton("Создать задачу", func() {
 		// Создаем диалог с формой
 		components.NewCreateModelForm(win)
-	})
+	}))
 
 	sidebar := components.NewSideBar(a) // Sidebar
 
@@ -69,18 +66,19 @@ func (a *TaskApp) Run() {
 		table.SetColumnWidth(i, float32(columnWidth))
 	}
 
-	content := container.NewBorder(
+	taskContent := container.NewBorder(
 		nil,
 		nil,
 		sidebar, // left
 		nil,
 		container.NewGridWithRows(2, container.NewHBox(container.NewVBox(toggleFormBtn)), table), // objects
 	)
+	t := container.NewAppTabs(container.NewTabItem("Задачи", taskContent), container.NewTabItem("Напоминания", widget.NewLabel("Напоминания")))
 
 	//---------------------------------------//
 	win.Resize(fyne.NewSize(1200, 800))
 	win.SetFixedSize(true)
-	win.SetContent(content)
+	win.SetContent(t)
 	win.CenterOnScreen()
 	win.ShowAndRun()
 }

@@ -74,7 +74,10 @@ func WriteTasksToFile(title, description, category string) error {
 	tasks = append(tasks, todo)
 
 	// Перезаписываем содержимое файла
-	file.Seek(0, 0)
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return err
+	}
 	err = file.Truncate(0)
 	if err != nil {
 		return err
@@ -109,6 +112,10 @@ func getNextId() (int, error) {
 	err = json.Unmarshal(data, &tasks)
 	if err != nil {
 		return 0, err
+	}
+
+	if len(tasks) == 0 {
+		return 1, nil
 	}
 
 	// Ищем максимальное значение id среди всех todo в срезе

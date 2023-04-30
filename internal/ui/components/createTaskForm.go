@@ -20,7 +20,13 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 		},
 	}
 
-	descriptionEntry := widget.NewEntry()
+	descriptionEntry := &widget.Entry{
+		Validator: func(text string) error {
+			if len(text) > 30 {
+				return fmt.Errorf("слишком длинное предложение")
+			}
+			return nil
+		}}
 	categoryEntry := widget.NewEntry()
 
 	items := []*widget.FormItem{

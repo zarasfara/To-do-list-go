@@ -121,6 +121,34 @@ func DeleteTask(id int) error {
 	return nil
 }
 
+func ChangeTaskStatus(taskID int) error {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return err
+	}
+
+	for i, task := range tasks {
+		if tasks[i].Id == taskID {
+			if task.Completed {
+				tasks[i].Completed = false
+				break
+			} else {
+				tasks[i].Completed = true
+				break
+			}
+		}
+	}
+
+	data, _ := json.Marshal(tasks)
+
+	err = os.WriteFile("tasks.json", data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 /*
 *
 Получаем id следующей структуры

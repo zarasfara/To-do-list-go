@@ -19,12 +19,12 @@ func NewTaskForm() *fyne.Container {
 		PlaceHolder: "Введите описание",
 	})
 
-	dateBtn := widget.NewFormItem("", buttons.NewDateButton())
+	dateEntry := widget.NewFormItem("", buttons.NewDateEntry())
 
 	form := widget.NewForm(
 		titleEntry,
 		descriptionEntry,
-		dateBtn,
+		dateEntry,
 	)
 
 	form.SubmitText = "Создать"

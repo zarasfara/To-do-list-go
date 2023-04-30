@@ -47,13 +47,22 @@ func (a *TaskApp) Run() {
 			widget.NewButton("Создать задачу", func() {
 				// Создаем диалог с формой
 				components.NewCreateModelForm(win, table)
-			}), widget.NewButton("Удалить задачу", func() {
+			}),
+			widget.NewButton("Удалить задачу", func() {
 				err := file.DeleteTask(components.TaskId)
 				if err != nil {
 					fmt.Errorf("ошибка")
 				}
 				table.RefreshTable()
-			})),
+			}),
+			widget.NewButton("Поменять статус", func() {
+				err := file.ChangeTaskStatus(components.TaskId)
+				if err != nil {
+					return
+				}
+				table.RefreshTable()
+			}),
+		),
 		),
 	)
 

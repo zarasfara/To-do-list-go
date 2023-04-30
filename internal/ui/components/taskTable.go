@@ -80,10 +80,16 @@ func NewTasksTable() *TaskTable {
 		TaskId = tasks[id.Row-1].Id
 	}
 
-	columnWidth := 1000 / len(headers) // вычисляем ширину колонки
-	for i := 0; i < len(headers); i++ {
-		table.SetColumnWidth(i, float32(columnWidth))
-	}
+	//columnWidth := 1000 / len(headers) // вычисляем ширину колонки
+	//for i := 0; i < len(headers); i++ {
+	//	table.SetColumnWidth(i, float32(columnWidth))
+	//}
+
+	table.SetColumnWidth(0, 50)
+	table.SetColumnWidth(1, 250)
+	table.SetColumnWidth(2, 450)
+	table.SetColumnWidth(3, 100)
+	table.SetColumnWidth(4, 150)
 
 	return table
 }

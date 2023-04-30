@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func NewDateButton() *widget.Entry {
+func NewDateEntry() *widget.Entry {
 	dateEntry := widget.NewEntry()
 	dateEntry.SetPlaceHolder("DD.MM.YYYY")
 

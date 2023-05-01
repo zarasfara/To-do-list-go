@@ -5,9 +5,9 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/zarasfara/to-do-list/internal/file"
 	"github.com/zarasfara/to-do-list/internal/ui/components"
 	"log"
 )
@@ -28,63 +28,60 @@ func NewTodoApp() *TaskApp {
 func (a *TaskApp) Run() {
 	win := a.NewWindow("Todo List")
 
+	if desk, ok := a.App.(desktop.App); ok {
+		m := fyne.NewMenu("myApp",
+			fyne.NewMenuItem("Показать", func() {
+				win.Show()
+			}))
+
+		desk.SetSystemTrayMenu(m)
+	}
+
 	icon, err := fyne.LoadResourceFromPath("assets/icon.png")
 	if err != nil {
 		log.Printf("ошибка при загрузке иконки: %s", err.Error())
 	}
 	win.SetIcon(icon)
 
-	// Сайд бар
-	sidebar := components.NewSideBar(a) // Sidebar
-
 	// Таблица с задачами
 	table := components.NewTasksTable()
 
-	// Кнопка вызова модалки создания таски
+	// Контейнер с задачами
+	buttonContainer := components.NewButtonsContainer(win, table)
 
-	buttonContainer := container.NewPadded(
-		container.NewVBox(container.NewHBox(
-			widget.NewButton("Создать задачу", func() {
-				// Создаем диалог с формой
-				components.NewCreateModelForm(win, table)
-			}),
-			widget.NewButton("Удалить задачу", func() {
-				err := file.DeleteTask(components.TaskId)
-				if err != nil {
-					fmt.Errorf("ошибка")
-				}
-				table.RefreshTable()
-			}),
-			widget.NewButton("Поменять статус", func() {
-				err := file.ChangeTaskStatus(components.TaskId)
-				if err != nil {
-					return
-				}
-				table.RefreshTable()
-			}),
-		),
-		),
-	)
+	// Главное меню
+	menu := components.NewMainMenu(a, win)
 
-	// Задаем контент для задач
-	taskContent := container.NewBorder(
-		nil,
-		nil,
-		sidebar, // left
-		nil,
-		container.NewGridWithRows(2, buttonContainer, table), // objects
-	)
+	// Шаблон для задач
+	taskContent := container.NewGridWithRows(2, buttonContainer, table)
 
-	// Задаем контент для напоминаний
-	// ...
+	taskMoreContent := components.NewDetailsTab(components.CurrentTaskId)
 
-	content := container.NewAppTabs(
-		container.NewTabItem("Задачи", taskContent),
-		container.NewTabItem("Напоминания", widget.NewLabel("Напоминания")),
-	)
+	win.SetMainMenu(menu)
+
+	fmt.Println(components.CurrentTaskId)
+
+	tabItems := []*container.TabItem{
+		container.NewTabItemWithIcon("Задачи", theme.ContentCopyIcon(), taskContent),
+		container.NewTabItemWithIcon("Напоминания", theme.ErrorIcon(), widget.NewLabel("Напоминания")),
+		container.NewTabItemWithIcon("Подробнее", theme.DocumentCreateIcon(), taskMoreContent),
+	}
+
+	/* Tabs */
+	content := container.NewAppTabs(tabItems...)
+
+	content.OnSelected = func(tabItem *container.TabItem) {
+
+		if tabItem.Text == "Подробнее" {
+			components.UpdateForm(components.CurrentTaskId)
+		}
+	}
 
 	//---------------------------------------//
 	win.Resize(fyne.NewSize(1200, 800))
+	win.SetCloseIntercept(func() {
+		win.Hide()
+	})
 	win.SetContent(content)
 	win.CenterOnScreen()
 	win.ShowAndRun()

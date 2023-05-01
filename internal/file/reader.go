@@ -8,15 +8,6 @@ import (
 	"os"
 )
 
-/*
-Parameters:
-
-	filePath (string): Имя файла
-
-Returns:
-
-	[]models.Task: Срез структур задач
-*/
 func ReadTasksFromFile() ([]models.Task, error) {
 	file, err := os.Open("tasks.json")
 	if err != nil {
@@ -89,6 +80,22 @@ func WriteTaskToFile(title, description, category string) error {
 	return nil
 }
 
+func GetTaskById(id int) (*models.Task, error) {
+	tasks, err := ReadTasksFromFile()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(tasks); i++ {
+		if id == tasks[i].Id {
+			return &tasks[i], nil
+		}
+	}
+
+	return nil, fmt.Errorf("task with ID %d not found", id)
+}
+
 func DeleteTask(id int) error {
 	tasks, err := ReadTasksFromFile()
 	if err != nil {
@@ -121,14 +128,14 @@ func DeleteTask(id int) error {
 	return nil
 }
 
-func ChangeTaskStatus(taskID int) error {
+func ChangeTaskStatus(CurrentTaskId int) error {
 	tasks, err := ReadTasksFromFile()
 	if err != nil {
 		return err
 	}
 
 	for i, task := range tasks {
-		if tasks[i].Id == taskID {
+		if tasks[i].Id == CurrentTaskId {
 			if task.Completed {
 				tasks[i].Completed = false
 				break
@@ -149,14 +156,6 @@ func ChangeTaskStatus(taskID int) error {
 	return nil
 }
 
-/*
-*
-Получаем id следующей структуры
-
-Return:
-
-	(int)id: айдшник следующей записи
-*/
 func getNextId() (int, error) {
 	// Считываем содержимое файла с сохраненными todo
 	file, err := os.Open("tasks.json")

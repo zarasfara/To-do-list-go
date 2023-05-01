@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var TaskId int
+var CurrentTaskId int
 
 var tasks []models.Task
 
@@ -76,14 +76,8 @@ func NewTasksTable() *TaskTable {
 		if id.Row == 0 { // Если выбрана первая строка, то ничего не делаем
 			return
 		}
-
-		TaskId = tasks[id.Row-1].Id
+		CurrentTaskId = tasks[id.Row-1].Id
 	}
-
-	//columnWidth := 1000 / len(headers) // вычисляем ширину колонки
-	//for i := 0; i < len(headers); i++ {
-	//	table.SetColumnWidth(i, float32(columnWidth))
-	//}
 
 	table.SetColumnWidth(0, 50)
 	table.SetColumnWidth(1, 250)

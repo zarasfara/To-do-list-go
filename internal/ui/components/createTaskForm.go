@@ -22,7 +22,7 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 
 	descriptionEntry := &widget.Entry{
 		Validator: func(text string) error {
-			if len(text) > 30 {
+			if len(text) > 50 {
 				return fmt.Errorf("слишком длинное предложение")
 			}
 			return nil
@@ -45,21 +45,20 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 	}
 
 	// Создаем диалог с формой
-	formDialog := dialog.NewForm("Введите данные", "Подтвердить", "Закрыть", items, func(ok bool) {
+	formDialog := dialog.NewForm("Создать задачу", "Подтвердить", "Закрыть", items, func(ok bool) {
 		if ok {
 			// Если нажата кнопка "Submit", выводим данные из формы в консоль
-			// fmt.Printf("title: %s\ndescription: %s\ncategory: %s\n", titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
 
 			err := file.WriteTaskToFile(titleEntry.Text, descriptionEntry.Text, categoryEntry.Text)
 			if err != nil {
-				fmt.Errorf("что-то пошло не так")
+				_ = fmt.Errorf("что-то пошло не так")
 			}
 
 			table.RefreshTable() // вызываем метод RefreshTable у таблицы
 		}
 	}, window)
 
-	formDialog.Resize(fyne.NewSize(500, 300))
+	formDialog.Resize(fyne.NewSize(600, 400))
 
 	// Отображаем диалог с формой
 	formDialog.Show()

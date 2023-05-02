@@ -4,13 +4,13 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
-	"github.com/zarasfara/to-do-list/pkg/models"
+	"github.com/zarasfara/to-do-list/internal/models"
 	"strconv"
 )
 
-var TaskId int
+var CurrentTaskId = -1
 
-var tasks []models.Task
+var tasks []*models.Task
 
 type TaskTable struct {
 	widget.Table
@@ -27,8 +27,14 @@ func (t *TaskTable) RefreshTable() {
 	t.Refresh()
 }
 
+func GetTasksTable() *TaskTable {
+	return &TaskTable{}
+}
+
 func NewTasksTable() *TaskTable {
-	table := &TaskTable{}
+
+	table := GetTasksTable()
+
 	table.ExtendBaseWidget(table)
 
 	// Создаем заголовки таблицы
@@ -76,19 +82,13 @@ func NewTasksTable() *TaskTable {
 		if id.Row == 0 { // Если выбрана первая строка, то ничего не делаем
 			return
 		}
-
-		TaskId = tasks[id.Row-1].Id
+		CurrentTaskId = tasks[id.Row-1].Id
 	}
 
-	//columnWidth := 1000 / len(headers) // вычисляем ширину колонки
-	//for i := 0; i < len(headers); i++ {
-	//	table.SetColumnWidth(i, float32(columnWidth))
-	//}
-
-	table.SetColumnWidth(0, 50)
-	table.SetColumnWidth(1, 250)
-	table.SetColumnWidth(2, 450)
-	table.SetColumnWidth(3, 100)
+	table.SetColumnWidth(0, 25)
+	table.SetColumnWidth(1, 275)
+	table.SetColumnWidth(2, 500)
+	table.SetColumnWidth(3, 200)
 	table.SetColumnWidth(4, 150)
 
 	return table

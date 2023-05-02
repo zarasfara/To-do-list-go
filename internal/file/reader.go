@@ -3,51 +3,39 @@ package file
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/zarasfara/to-do-list/pkg/models"
+	"github.com/zarasfara/to-do-list/internal/models"
 	"io"
 	"os"
+	"sort"
 )
 
-/*
-Parameters:
-
-	filePath (string): Имя файла
-
-Returns:
-
-	[]models.Task: Срез структур задач
-*/
-func ReadTasksFromFile() ([]models.Task, error) {
+// получить все задачи
+func ReadTasksFromFile() ([]*models.Task, error) {
+	// Открываем файл с задачами
 	file, err := os.Open("tasks.json")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-
 	defer file.Close()
 
-	data, err := io.ReadAll(file)
-	if err != nil {
-		panic(err)
-	}
-
-	var tasks []models.Task
-
-	err = json.Unmarshal(data, &tasks)
-	if err != nil {
-		panic(err)
+	// Читаем содержимое файла
+	var tasks []*models.Task
+	if err := json.NewDecoder(file).Decode(&tasks); err != nil && err != io.EOF {
+		return nil, err
 	}
 
 	return tasks, nil
 }
 
+// добавить задачу
 func WriteTaskToFile(title, description, category string) error {
-
 	// Получаем следующее значение id
 	nextId, err := getNextId()
 	if err != nil {
-		fmt.Errorf("ошибка: %s", err)
+		return fmt.Errorf("ошибка: %s", err)
 	}
 
+	// Создаем новую задачу
 	todo := &models.Task{
 		Id:          nextId,
 		Title:       title,
@@ -63,32 +51,43 @@ func WriteTaskToFile(title, description, category string) error {
 	}
 	defer file.Close()
 
+	// Читаем содержимое файла
 	var tasks []*models.Task
-	err = json.NewDecoder(file).Decode(&tasks)
-	if err != nil && err != io.EOF {
+	if err := json.NewDecoder(file).Decode(&tasks); err != nil && err != io.EOF {
 		return err
 	}
 
-	// Добавляем новый объект в конец массива
+	// Добавляем новую задачу в конец массива
 	tasks = append(tasks, todo)
 
 	// Перезаписываем содержимое файла
-	_, err = file.Seek(0, 0)
-	if err != nil {
-		return err
-	}
-	err = file.Truncate(0)
-	if err != nil {
-		return err
-	}
-	err = json.NewEncoder(file).Encode(&tasks)
-	if err != nil {
+	file.Seek(0, 0)  // перемещаем позицию указателя чтения/записи в начало файла.
+	file.Truncate(0) //  используется для очистки файла перед перезаписью его содержимого.
+	if err := json.NewEncoder(file).Encode(&tasks); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// получить задачу
+func GetTaskById(id int) (*models.Task, error) {
+	tasks, err := ReadTasksFromFile()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(tasks); i++ {
+		if id == tasks[i].Id {
+			return tasks[i], nil
+		}
+	}
+
+	return nil, fmt.Errorf("task with ID %d not found", id)
+}
+
+// удалить задачу
 func DeleteTask(id int) error {
 	tasks, err := ReadTasksFromFile()
 	if err != nil {
@@ -121,14 +120,85 @@ func DeleteTask(id int) error {
 	return nil
 }
 
-func ChangeTaskStatus(taskID int) error {
+// инкремент id
+func getNextId() (int, error) {
+	file, err := os.Open("tasks.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 1, nil
+		}
+		return 0, err
+	}
+
+	defer file.Close()
+
+	var tasks []*models.Task
+	if err := json.NewDecoder(file).Decode(&tasks); err != nil && err != io.EOF {
+		return 0, err
+	}
+
+	if len(tasks) == 0 {
+		return 1, nil
+	}
+
+	sort.Slice(tasks, func(i, j int) bool {
+		return tasks[i].Id < tasks[j].Id
+	})
+
+	return tasks[len(tasks)-1].Id + 1, nil
+}
+
+// обновить задачу
+func UpdateTask(id int, title, description string, completed bool) (bool, error) {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return false, err
+	}
+
+	// Находим задачу по её ID
+	task := FindTaskById(tasks, id)
+	if task == nil {
+		return false, fmt.Errorf("задача с id %d не найдена", id)
+	}
+
+	// Обновляем поля задачи
+	task.Title = title
+	task.Description = description
+	task.Completed = completed
+
+	// Перезаписываем все задачи в файл
+	data, err := json.Marshal(tasks)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile("tasks.json", data, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// функция для поиска задачи в срезе задач по её ID
+func FindTaskById(tasks []*models.Task, id int) *models.Task {
+	for _, task := range tasks {
+		if task.Id == id {
+			return task
+		}
+	}
+	return nil
+}
+
+// изменить статус
+func ChangeTaskStatus(CurrentTaskId int) error {
 	tasks, err := ReadTasksFromFile()
 	if err != nil {
 		return err
 	}
 
 	for i, task := range tasks {
-		if tasks[i].Id == taskID {
+		if tasks[i].Id == CurrentTaskId {
 			if task.Completed {
 				tasks[i].Completed = false
 				break
@@ -147,44 +217,4 @@ func ChangeTaskStatus(taskID int) error {
 	}
 
 	return nil
-}
-
-/*
-*
-Получаем id следующей структуры
-
-Return:
-
-	(int)id: айдшник следующей записи
-*/
-func getNextId() (int, error) {
-	// Считываем содержимое файла с сохраненными todo
-	file, err := os.Open("tasks.json")
-	if err != nil {
-		return 0, err
-	}
-
-	data, _ := io.ReadAll(file)
-
-	// Распарсиваем содержимое файла из JSON-формата в массив todoList
-	var tasks []*models.Task
-	err = json.Unmarshal(data, &tasks)
-	if err != nil {
-		return 0, err
-	}
-
-	if len(tasks) == 0 {
-		return 1, nil
-	}
-
-	// Ищем максимальное значение id среди всех todo в срезе
-	var maxId int
-	for _, todo := range tasks {
-		if todo.Id > maxId {
-			maxId = todo.Id
-		}
-	}
-
-	// Возвращаем максимальное значение id плюс один
-	return maxId + 1, nil
 }

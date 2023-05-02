@@ -9,7 +9,7 @@ import (
 	"sort"
 )
 
-// Получить все задачи
+// получить все задачи
 func ReadTasksFromFile() ([]*models.Task, error) {
 	// Открываем файл с задачами
 	file, err := os.Open("tasks.json")
@@ -27,7 +27,7 @@ func ReadTasksFromFile() ([]*models.Task, error) {
 	return tasks, nil
 }
 
-// Добавить задачу
+// добавить задачу
 func WriteTaskToFile(title, description, category string) error {
 	// Получаем следующее значение id
 	nextId, err := getNextId()
@@ -70,7 +70,7 @@ func WriteTaskToFile(title, description, category string) error {
 	return nil
 }
 
-// Получить задачу
+// получить задачу
 func GetTaskById(id int) (*models.Task, error) {
 	tasks, err := ReadTasksFromFile()
 
@@ -120,6 +120,76 @@ func DeleteTask(id int) error {
 	return nil
 }
 
+// инкремент id
+func getNextId() (int, error) {
+	file, err := os.Open("tasks.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 1, nil
+		}
+		return 0, err
+	}
+
+	defer file.Close()
+
+	var tasks []*models.Task
+	if err := json.NewDecoder(file).Decode(&tasks); err != nil && err != io.EOF {
+		return 0, err
+	}
+
+	if len(tasks) == 0 {
+		return 1, nil
+	}
+
+	sort.Slice(tasks, func(i, j int) bool {
+		return tasks[i].Id < tasks[j].Id
+	})
+
+	return tasks[len(tasks)-1].Id + 1, nil
+}
+
+// обновить задачу
+func UpdateTask(id int, title, description string, completed bool) (bool, error) {
+	tasks, err := ReadTasksFromFile()
+	if err != nil {
+		return false, err
+	}
+
+	// Находим задачу по её ID
+	task := FindTaskById(tasks, id)
+	if task == nil {
+		return false, fmt.Errorf("задача с id %d не найдена", id)
+	}
+
+	// Обновляем поля задачи
+	task.Title = title
+	task.Description = description
+	task.Completed = completed
+
+	// Перезаписываем все задачи в файл
+	data, err := json.Marshal(tasks)
+	if err != nil {
+		return false, err
+	}
+
+	err = os.WriteFile("tasks.json", data, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// функция для поиска задачи в срезе задач по её ID
+func FindTaskById(tasks []*models.Task, id int) *models.Task {
+	for _, task := range tasks {
+		if task.Id == id {
+			return task
+		}
+	}
+	return nil
+}
+
 // изменить статус
 func ChangeTaskStatus(CurrentTaskId int) error {
 	tasks, err := ReadTasksFromFile()
@@ -146,73 +216,5 @@ func ChangeTaskStatus(CurrentTaskId int) error {
 		return err
 	}
 
-	return nil
-}
-
-// инкремент id
-func getNextId() (int, error) {
-	file, err := os.Open("tasks.json")
-	if err != nil {
-		if os.IsNotExist(err) {
-			return 1, nil
-		}
-		return 0, err
-	}
-	defer file.Close()
-
-	var tasks []*models.Task
-	if err := json.NewDecoder(file).Decode(&tasks); err != nil && err != io.EOF {
-		return 0, err
-	}
-
-	if len(tasks) == 0 {
-		return 1, nil
-	}
-
-	sort.Slice(tasks, func(i, j int) bool {
-		return tasks[i].Id < tasks[j].Id
-	})
-
-	return tasks[len(tasks)-1].Id + 1, nil
-}
-
-func UpdateTask(id int, title, description string, completed bool) error {
-	tasks, err := ReadTasksFromFile()
-	if err != nil {
-		return err
-	}
-
-	// Находим задачу по её ID
-	task := FindTaskById(tasks, id)
-	if task == nil {
-		return fmt.Errorf("задача с id %d не найдена", id)
-	}
-
-	// Обновляем поля задачи
-	task.Title = title
-	task.Description = description
-	task.Completed = completed
-
-	// Перезаписываем все задачи в файл
-	data, err := json.Marshal(tasks)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile("tasks.json", data, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Функция для поиска задачи в срезе задач по её ID
-func FindTaskById(tasks []*models.Task, id int) *models.Task {
-	for _, task := range tasks {
-		if task.Id == id {
-			return task
-		}
-	}
 	return nil
 }

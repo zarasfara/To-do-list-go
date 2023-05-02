@@ -1,17 +1,17 @@
 package components
 
 import (
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
 )
 
 var nameEntry = widget.NewEntry()
 var descEntry = widget.NewMultiLineEntry()
-var doneCheck = widget.NewCheck("Выполнено", func(checked bool) {
-	// Здесь можно добавить код, который будет выполнен при изменении состояния doneCheck
-})
+var doneCheck = widget.NewCheck("Выполнено", func(checked bool) {})
 
-func NewDetailsTab() *widget.Form {
+func NewDetailsTab(window fyne.Window) *widget.Form {
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
@@ -24,7 +24,16 @@ func NewDetailsTab() *widget.Form {
 			desc := descEntry.Text
 			done := doneCheck.Checked
 
-			file.UpdateTask(CurrentTaskId, name, desc, done)
+			success, _ := file.UpdateTask(CurrentTaskId, name, desc, done)
+
+			if success {
+				infoDialog := dialog.NewInformation(
+					"Успех!",
+					"Успешно обновлено",
+					window)
+				infoDialog.SetDismissText("Закрыть")
+				infoDialog.Show()
+			}
 
 			GetTasksTable().RefreshTable()
 		},

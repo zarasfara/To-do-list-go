@@ -22,7 +22,7 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 
 	descriptionEntry := &widget.Entry{
 		Validator: func(text string) error {
-			if len(text) > 30 {
+			if len(text) > 50 {
 				return fmt.Errorf("слишком длинное предложение")
 			}
 			return nil

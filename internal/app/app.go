@@ -6,7 +6,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/ui/components"
 	"log"
 )
@@ -24,6 +23,10 @@ func NewTodoApp() *TaskApp {
 	}
 }
 
+func GetTasksTable() *TaskApp {
+	return &TaskApp{}
+}
+
 func (a *TaskApp) Run() {
 	win := a.NewWindow("Todo List")
 
@@ -35,12 +38,6 @@ func (a *TaskApp) Run() {
 
 		desk.SetSystemTrayMenu(m)
 	}
-
-	icon, err := fyne.LoadResourceFromPath("assets/icon.png")
-	if err != nil {
-		log.Printf("ошибка при загрузке иконки: %s", err.Error())
-	}
-	win.SetIcon(icon)
 
 	// Таблица с задачами
 	table := components.NewTasksTable()
@@ -54,13 +51,11 @@ func (a *TaskApp) Run() {
 	// Шаблон для задач
 	taskContent := container.NewGridWithRows(2, buttonContainer, table)
 
-	taskMoreContent := components.NewDetailsTab()
-
-	win.SetMainMenu(menu)
+	taskMoreContent := components.NewDetailsTab(win)
 
 	tabItems := []*container.TabItem{
 		container.NewTabItemWithIcon("Задачи", theme.ContentCopyIcon(), taskContent),
-		container.NewTabItemWithIcon("Напоминания", theme.ErrorIcon(), widget.NewLabel("Напоминания")),
+		// container.NewTabItemWithIcon("Напоминания", theme.ErrorIcon(), widget.NewLabel("Напоминания")),
 		container.NewTabItemWithIcon("Подробнее", theme.DocumentCreateIcon(), taskMoreContent),
 	}
 
@@ -68,14 +63,19 @@ func (a *TaskApp) Run() {
 	content := container.NewAppTabs(tabItems...)
 
 	content.OnSelected = func(tabItem *container.TabItem) {
-
 		if tabItem.Text == "Подробнее" {
 			components.UpdateForm(components.CurrentTaskId)
 		}
 	}
 
 	//---------------------------------------//
+	icon, err := fyne.LoadResourceFromPath("assets/icon.png")
+	if err != nil {
+		log.Printf("ошибка при загрузке иконки: %s", err.Error())
+	}
+	win.SetIcon(icon)
 	win.Resize(fyne.NewSize(1200, 800))
+	win.SetMainMenu(menu)
 	win.SetCloseIntercept(func() {
 		win.Hide()
 	})

@@ -21,18 +21,10 @@ func NewButtonsContainer(win fyne.Window, table *TaskTable) *fyne.Container {
 			widget.NewButton("Удалить задачу", func() {
 				err := file.DeleteTask(CurrentTaskId)
 				if err != nil {
-					fmt.Errorf("ошибка")
+					_ = fmt.Errorf("ошибка")
 				}
 				CurrentTaskId = -1
 				table.RefreshTable()
 			}),
-			widget.NewButton("Поменять статус", func() {
-				err := file.ChangeTaskStatus(CurrentTaskId)
-				if err != nil {
-					return
-				}
-				table.RefreshTable()
-			}),
 		))
-
 }

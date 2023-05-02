@@ -85,9 +85,9 @@ func NewTasksTable() *TaskTable {
 		CurrentTaskId = tasks[id.Row-1].Id
 	}
 
-	table.SetColumnWidth(0, 50)
-	table.SetColumnWidth(1, 250)
-	table.SetColumnWidth(2, 450)
+	table.SetColumnWidth(0, 25)
+	table.SetColumnWidth(1, 275)
+	table.SetColumnWidth(2, 500)
 	table.SetColumnWidth(3, 200)
 	table.SetColumnWidth(4, 150)
 

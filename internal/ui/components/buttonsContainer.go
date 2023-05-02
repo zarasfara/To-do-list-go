@@ -23,6 +23,7 @@ func NewButtonsContainer(win fyne.Window, table *TaskTable) *fyne.Container {
 				if err != nil {
 					fmt.Errorf("ошибка")
 				}
+				CurrentTaskId = -1
 				table.RefreshTable()
 			}),
 			widget.NewButton("Поменять статус", func() {

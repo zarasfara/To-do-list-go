@@ -6,29 +6,29 @@ import (
 	"fyne.io/fyne/v2/theme"
 )
 
-var themeVar = true
+var appTheme = true
 
 func NewMainMenu(app fyne.App, window fyne.Window) *fyne.MainMenu {
 
 	settingsAbout := fyne.NewMenuItem("О программе", func() {
-		mydialog := dialog.NewInformation(
+		infoDialog := dialog.NewInformation(
 			"О программе",
 			"Версия: 1.0\nАвтор: Евгений Осипов\n",
 			window)
-		mydialog.SetDismissText("Закрыть")
-		mydialog.Show()
+		infoDialog.SetDismissText("Закрыть")
+		infoDialog.Show()
 	})
 
 	// Создаем меню с пунктом "Настройки"
 	settingsMenu := fyne.NewMenuItem("Поменять тему", func() {
-		if themeVar {
+		if appTheme {
 			// Текущая тема - темная
 			app.Settings().SetTheme(theme.LightTheme())
-			themeVar = false
+			appTheme = false
 		} else {
 			// Текущая тема - светлая
 			app.Settings().SetTheme(theme.DarkTheme())
-			themeVar = true
+			appTheme = true
 		}
 	})
 

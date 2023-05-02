@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -55,11 +54,9 @@ func (a *TaskApp) Run() {
 	// Шаблон для задач
 	taskContent := container.NewGridWithRows(2, buttonContainer, table)
 
-	taskMoreContent := components.NewDetailsTab(components.CurrentTaskId)
+	taskMoreContent := components.NewDetailsTab()
 
 	win.SetMainMenu(menu)
-
-	fmt.Println(components.CurrentTaskId)
 
 	tabItems := []*container.TabItem{
 		container.NewTabItemWithIcon("Задачи", theme.ContentCopyIcon(), taskContent),

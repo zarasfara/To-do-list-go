@@ -149,7 +149,7 @@ func getNextId() (int, error) {
 }
 
 // обновить задачу
-func UpdateTask(id int, title, description string, completed bool) (bool, error) {
+func UpdateTask(id int, title, description string, completed bool, category string) (bool, error) {
 	tasks, err := ReadTasksFromFile()
 	if err != nil {
 		return false, err

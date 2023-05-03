@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/ui/buttons"
 )
@@ -15,17 +17,17 @@ type Remind struct {
 
 var Reminders []Remind
 
-func NewReminderForm() *widget.Form {
+func NewReminderForm(window fyne.Window) *widget.Form {
 	datetest := buttons.NewDateEntry()
 
 	title := widget.NewEntry()
 
-	title.Validator = func(s string) error {
+	title.Validator = func(text string) error {
 		// Проверяем, что значение не пустое
-		if s == "" {
-			return fmt.Errorf("необходимо ввести значение")
+		if len(text) == 0 {
+			return fmt.Errorf("поле не может быть пустым")
 		}
-		
+
 		return nil
 	}
 
@@ -56,11 +58,24 @@ func NewReminderForm() *widget.Form {
 		}
 
 		Reminders = append(Reminders, reminder)
+
+		infoDialog := dialog.NewInformation(
+			"Успех!",
+			"Успешно создано",
+			window)
+		infoDialog.SetDismissText("Закрыть")
+		infoDialog.Show()
 	}
 
 	return reminderForm
 }
 
 func RemoveItem(slice []Remind, index int) []Remind {
+    if index < 0 || index >= len(slice) {
+        return slice
+    }
+    if len(slice) == 1 {
+        return []Remind{}
+    }
     return append(slice[:index], slice[index+1:]...)
 }

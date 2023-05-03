@@ -1,22 +1,33 @@
 package components
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
 )
-
 var nameEntry = widget.NewEntry()
 var descEntry = widget.NewMultiLineEntry()
+var categoryEntry = widget.NewEntry()
 var doneCheck = widget.NewCheck("Выполнено", func(checked bool) {})
 
 func NewDetailsTab(window fyne.Window) *widget.Form {
+
+	nameEntry.Validator = func(text string) error {
+		if len(text) == 0 {
+			return fmt.Errorf("поле не может быть пустым")
+		}
+
+		return nil
+	}
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
 			{Text: "Название", Widget: nameEntry},
 			{Text: "Описание", Widget: descEntry},
+			{Text: "Категория", Widget: categoryEntry},
 			{Text: "Выполнено", Widget: doneCheck},
 		},
 		OnSubmit: func() {
@@ -44,7 +55,6 @@ func NewDetailsTab(window fyne.Window) *widget.Form {
 }
 
 func UpdateForm(id int) {
-
 	task, _ := file.GetTaskById(id)
 
 	if id < 0 || task == nil {

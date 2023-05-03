@@ -2,8 +2,9 @@ package buttons
 
 import (
 	"fmt"
-	"fyne.io/fyne/v2/widget"
 	"time"
+
+	"fyne.io/fyne/v2/widget"
 )
 
 func NewDateEntry() *widget.Entry {
@@ -13,7 +14,7 @@ func NewDateEntry() *widget.Entry {
 	dateEntry.Validator = func(text string) error {
 
 		if len(text) == 0 {
-			return fmt.Errorf("необходимо ввести значение")
+			return fmt.Errorf("поле не может быть пустым")
 		}
 
 		// Парсим дату

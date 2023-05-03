@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -14,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"github.com/zarasfara/to-do-list/internal/ui/components"
 )
+
 
 type TaskApp struct {
 	fyne.App
@@ -53,31 +53,34 @@ func (a *TaskApp) Run() {
 	taskContent := container.NewGridWithRows(2, buttonContainer, table)
 
 	// Шаблон для нопоминаний
-	reminderContent := container.NewGridWithRows(2,
-		components.NewReminderForm(),
+	reminderContent := container.NewPadded(
+		container.NewGridWithRows(2, components.NewReminderForm(win),
+		),
 	)
 
-	var mutex sync.Mutex
 	go func() {
 		for range time.Tick(time.Minute) {
 			nowFormatted := time.Now().Format("02.01.2006 15:04")
-
-			mutex.Lock()
-			for i, v := range components.Reminders {
+	
+			for i := 0; i < len(components.Reminders); i++ {
+				v := components.Reminders[i]
 				dateFormatted := v.Date.Format("02.01.2006 15:04")
 				if dateFormatted <= nowFormatted {
 					win.Show()
 					dialog.ShowInformation("Напоминание", v.Title, win)
 					// Удаляем элемент из slice
+					fmt.Println("До: ", components.Reminders)
 					components.Reminders = components.RemoveItem(components.Reminders, i)
-					fmt.Println(components.Reminders)
+					fmt.Println("После: ", components.Reminders)
+					i-- // делаем decrement для индексов
 				}
 			}
-			mutex.Unlock()
 		}
 	}()
 
-	taskMoreContent := components.NewDetailsTab(win)
+	taskMoreContent := container.NewPadded(
+		components.NewDetailsTab(win),
+	)
 
 	tabItems := []*container.TabItem{
 		container.NewTabItemWithIcon("Задачи", theme.ContentCopyIcon(), taskContent),

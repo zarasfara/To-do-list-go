@@ -20,6 +20,16 @@ func NewDateEntry() *widget.Entry {
 		if err != nil {
 			return fmt.Errorf("неверный формат")
 		}
+
+		now := time.Now() // 03.05.2023 15:47
+		nowFormatted := now.Format("02.01.2006 15:04")
+		dateFormatted:= date.Format("02.01.2006 15:04")
+		fmt.Println(dateFormatted)
+		fmt.Println(nowFormatted)
+		if dateFormatted < nowFormatted {
+			return fmt.Errorf("aboba")
+		}
+
 		return nil
 	}
 

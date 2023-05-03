@@ -2,22 +2,19 @@ package components
 
 import (
 	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
+	"github.com/zarasfara/to-do-list/pkg/validator"
 )
 
-func NewCreateModelForm(window fyne.Window, table *TaskTable) {
+func NewCreateModalForm(window fyne.Window, table *TaskTable) {
 
 	// Создаем форму с необходимыми элементами
 	titleEntry := &widget.Entry{
-		Validator: func(text string) error {
-			if len(text) == 0 {
-				return fmt.Errorf("необходимо ввести значение")
-			}
-			return nil
-		},
+		Validator: validator.IsValidString,
 	}
 
 	descriptionEntry := &widget.Entry{
@@ -25,6 +22,7 @@ func NewCreateModelForm(window fyne.Window, table *TaskTable) {
 			if len(text) > 50 {
 				return fmt.Errorf("слишком длинное предложение")
 			}
+			
 			return nil
 		}}
 	categoryEntry := widget.NewEntry()

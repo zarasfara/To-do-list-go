@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/ui/buttons"
+	"github.com/zarasfara/to-do-list/pkg/validator"
 )
 
 type Remind struct {
@@ -21,15 +22,7 @@ func NewReminderForm(window fyne.Window) *widget.Form {
 	datetest := buttons.NewDateEntry()
 
 	title := widget.NewEntry()
-
-	title.Validator = func(text string) error {
-		// Проверяем, что значение не пустое
-		if len(text) == 0 {
-			return fmt.Errorf("поле не может быть пустым")
-		}
-
-		return nil
-	}
+	title.Validator = validator.IsValidString
 
 	titleEntry := widget.NewFormItem("Название", title)
 
@@ -48,7 +41,7 @@ func NewReminderForm(window fyne.Window) *widget.Form {
 
 		date, err := time.Parse(dateTimeLayout, dateTimeString)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Errorf("%s", err)
 			return
 		}
 
@@ -71,11 +64,11 @@ func NewReminderForm(window fyne.Window) *widget.Form {
 }
 
 func RemoveItem(slice []Remind, index int) []Remind {
-    if index < 0 || index >= len(slice) {
-        return slice
-    }
-    if len(slice) == 1 {
-        return []Remind{}
-    }
-    return append(slice[:index], slice[index+1:]...)
+	if index < 0 || index >= len(slice) {
+		return slice
+	}
+	if len(slice) == 1 {
+		return []Remind{}
+	}
+	return append(slice[:index], slice[index+1:]...)
 }

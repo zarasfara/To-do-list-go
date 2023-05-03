@@ -90,9 +90,7 @@ func CheckTime(win fyne.Window) {
 				win.Show()
 				dialog.ShowInformation("Напоминание", v.Title, win)
 				// Удаляем элемент из slice
-				fmt.Println("До: ", Reminders)
 				Reminders = RemoveItem(Reminders, i)
-				fmt.Println("После: ", Reminders)
 				i-- // делаем decrement для индексов
 			}
 		}

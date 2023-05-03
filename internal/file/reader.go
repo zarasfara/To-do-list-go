@@ -84,7 +84,7 @@ func GetTaskById(id int) (*models.Task, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("task with ID %d not found", id)
+	return nil, fmt.Errorf("задача с id %d не найдена", id)
 }
 
 // удалить задачу

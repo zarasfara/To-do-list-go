@@ -1,11 +1,13 @@
 package components
 
 import (
+	"strconv"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
 	"github.com/zarasfara/to-do-list/internal/models"
-	"strconv"
 )
 
 var CurrentTaskId = -1
@@ -46,12 +48,12 @@ func NewTasksTable() *TaskTable {
 		return len(tasks) + 1, 5 // 5 строки, 5 столбца
 	}
 	table.CreateCell = func() fyne.CanvasObject {
-		return widget.NewLabel("Cell")
+		return container.NewHScroll(widget.NewLabel("Cell"))
 	}
 	table.UpdateCell = func(cell widget.TableCellID, cellView fyne.CanvasObject) {
 
 		if cell.Row == 0 { // Если первая строка выводим данные из массива заголовков
-			cellView.(*widget.Label).SetText(headers[cell.Col])
+			cellView.(*container.Scroll).Content.(*widget.Label).SetText(headers[cell.Col])
 
 		} else if cell.Row <= len(tasks) { // выбранная строка в таблице находится в диапазоне допустимых индексов
 
@@ -59,13 +61,13 @@ func NewTasksTable() *TaskTable {
 			task := tasks[cell.Row-1]
 			switch cell.Col {
 			case 0:
-				cellView.(*widget.Label).SetText(strconv.Itoa(task.Id))
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(strconv.Itoa(task.Id))
 			case 1:
-				cellView.(*widget.Label).SetText(task.Title)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Title)
 			case 2:
-				cellView.(*widget.Label).SetText(task.Description)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Description)
 			case 3:
-				cellView.(*widget.Label).SetText(task.Category)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Category)
 			case 4:
 				var text string
 				if task.Completed {
@@ -73,7 +75,7 @@ func NewTasksTable() *TaskTable {
 				} else {
 					text = "В работе"
 				}
-				cellView.(*widget.Label).SetText(text)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(text)
 			}
 		}
 	}
@@ -85,7 +87,7 @@ func NewTasksTable() *TaskTable {
 		CurrentTaskId = tasks[id.Row-1].Id
 	}
 
-	table.SetColumnWidth(0, 25)
+	table.SetColumnWidth(0, 30)
 	table.SetColumnWidth(1, 275)
 	table.SetColumnWidth(2, 500)
 	table.SetColumnWidth(3, 200)

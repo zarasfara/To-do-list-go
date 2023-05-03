@@ -8,26 +8,26 @@ import (
 
 func NewDateEntry() *widget.Entry {
 	dateEntry := widget.NewEntry()
-	dateEntry.SetPlaceHolder("DD.MM.YYYY")
+	dateEntry.SetPlaceHolder("02.01.2006 15:04")
 
 	dateEntry.Validator = func(text string) error {
 
-		if text == "" {
+		if len(text) == 0 {
 			return fmt.Errorf("необходимо ввести значение")
 		}
 
-		_, err := time.Parse("02.01.2006", text)
+		// Парсим дату
+		date, err := time.Parse("02.01.2006 15:04", text)
 		if err != nil {
 			return fmt.Errorf("неверный формат")
 		}
 
-		now := time.Now() // 03.05.2023 15:47
-		nowFormatted := now.Format("02.01.2006 15:04")
-		dateFormatted:= date.Format("02.01.2006 15:04")
-		fmt.Println(dateFormatted)
-		fmt.Println(nowFormatted)
-		if dateFormatted < nowFormatted {
-			return fmt.Errorf("aboba")
+		// Получаем текущую дату
+		now := time.Now()
+
+		// Сравниваем даты
+		if date.Before(now) {
+			return fmt.Errorf("дата не может быть прошедшей")
 		}
 
 		return nil
@@ -35,3 +35,4 @@ func NewDateEntry() *widget.Entry {
 
 	return dateEntry
 }
+

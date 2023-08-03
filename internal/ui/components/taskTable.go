@@ -1,11 +1,13 @@
 package components
 
 import (
+	"strconv"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zarasfara/to-do-list/internal/file"
 	"github.com/zarasfara/to-do-list/internal/models"
-	"strconv"
 )
 
 var CurrentTaskId = -1
@@ -35,6 +37,8 @@ func NewTasksTable() *TaskTable {
 
 	table := GetTasksTable()
 
+
+
 	table.ExtendBaseWidget(table)
 
 	// Создаем заголовки таблицы
@@ -46,12 +50,12 @@ func NewTasksTable() *TaskTable {
 		return len(tasks) + 1, 5 // 5 строки, 5 столбца
 	}
 	table.CreateCell = func() fyne.CanvasObject {
-		return widget.NewLabel("Cell")
+		return container.NewHScroll(widget.NewLabel("Cell"))
 	}
 	table.UpdateCell = func(cell widget.TableCellID, cellView fyne.CanvasObject) {
 
 		if cell.Row == 0 { // Если первая строка выводим данные из массива заголовков
-			cellView.(*widget.Label).SetText(headers[cell.Col])
+			cellView.(*container.Scroll).Content.(*widget.Label).SetText(headers[cell.Col])
 
 		} else if cell.Row <= len(tasks) { // выбранная строка в таблице находится в диапазоне допустимых индексов
 
@@ -59,13 +63,13 @@ func NewTasksTable() *TaskTable {
 			task := tasks[cell.Row-1]
 			switch cell.Col {
 			case 0:
-				cellView.(*widget.Label).SetText(strconv.Itoa(task.Id))
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(strconv.Itoa(task.Id))
 			case 1:
-				cellView.(*widget.Label).SetText(task.Title)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Title)
 			case 2:
-				cellView.(*widget.Label).SetText(task.Description)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Description)
 			case 3:
-				cellView.(*widget.Label).SetText(task.Category)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(task.Category)
 			case 4:
 				var text string
 				if task.Completed {
@@ -73,7 +77,7 @@ func NewTasksTable() *TaskTable {
 				} else {
 					text = "В работе"
 				}
-				cellView.(*widget.Label).SetText(text)
+				cellView.(*container.Scroll).Content.(*widget.Label).SetText(text)
 			}
 		}
 	}
@@ -82,6 +86,7 @@ func NewTasksTable() *TaskTable {
 		if id.Row == 0 { // Если выбрана первая строка, то ничего не делаем
 			return
 		}
+		CurrentTaskId = tasks[id.Row-1].Id
 		CurrentTaskId = tasks[id.Row-1].Id
 	}
 

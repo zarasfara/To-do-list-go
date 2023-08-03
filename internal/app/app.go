@@ -1,14 +1,16 @@
 package app
 
 import (
+	"log"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"github.com/zarasfara/to-do-list/internal/ui/components"
-	"log"
 )
+
 
 type TaskApp struct {
 	fyne.App
@@ -51,11 +53,21 @@ func (a *TaskApp) Run() {
 	// Шаблон для задач
 	taskContent := container.NewGridWithRows(2, buttonContainer, table)
 
-	taskMoreContent := components.NewDetailsTab(win)
+	// Шаблон для нопоминаний
+	reminderContent := container.NewPadded(
+		container.NewGridWithRows(2, components.NewReminderForm(win),
+		),
+	)
+
+	go components.CheckTime(win)
+
+	taskMoreContent := container.NewPadded(
+		components.NewDetailsTab(win),
+	)
 
 	tabItems := []*container.TabItem{
 		container.NewTabItemWithIcon("Задачи", theme.ContentCopyIcon(), taskContent),
-		// container.NewTabItemWithIcon("Напоминания", theme.ErrorIcon(), widget.NewLabel("Напоминания")),
+		container.NewTabItemWithIcon("Напоминания", theme.ErrorIcon(), reminderContent),
 		container.NewTabItemWithIcon("Подробнее", theme.DocumentCreateIcon(), taskMoreContent),
 	}
 
@@ -68,7 +80,7 @@ func (a *TaskApp) Run() {
 		}
 	}
 
-	//---------------------------------------//
+	//-----------------------------------------------------------------//
 	icon, err := fyne.LoadResourceFromPath("assets/icon.png")
 	if err != nil {
 		log.Printf("ошибка при загрузке иконки: %s", err.Error())

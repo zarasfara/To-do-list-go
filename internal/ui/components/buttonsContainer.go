@@ -16,7 +16,7 @@ func NewButtonsContainer(win fyne.Window, table *TaskTable) *fyne.Container {
 			// Кнопка вызова модалки создания таски
 			widget.NewButton("Создать задачу", func() {
 				// Создаем диалог с формой
-				NewCreateModelForm(win, table)
+				NewCreateModalForm(win, table)
 			}),
 			widget.NewButton("Удалить задачу", func() {
 				err := file.DeleteTask(CurrentTaskId)
